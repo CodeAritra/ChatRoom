@@ -9,8 +9,8 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
+    origin: "*",
+    methods: ["GET", "POST"],
   },
 });
 
@@ -24,12 +24,26 @@ io.on("connection", (socket) => {
     socket.to(roomId).emit("receive-message", {
       username: "System",
       text: `${username} joined the room.`,
-      time: new Date().toLocaleTimeString(),
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+
     });
   });
 
   socket.on("chat-message", (roomId, message) => {
     socket.to(roomId).emit("receive-message", message);
+  });
+
+  socket.on("leave-room", (roomId, username) => {
+    socket.leave(roomId);
+
+    socket.to(roomId).emit("user-left", {
+      text: `${username} left the chat.`,
+      username: "System",
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+
+    });
+
+    console.log(`${username} left room ${roomId}`);
   });
 
   socket.on("disconnect", () => {

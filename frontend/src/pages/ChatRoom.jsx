@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ChatBox from "../comonents/ChatBox";
-import io from "socket.io-client";
-
-const socket = io("http://localhost:5000");
+import socket from "../Socket"; 
 
 const ChatRoom = () => {
   const [messages, setMessages] = useState([]);
@@ -14,14 +12,20 @@ const ChatRoom = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!socket.connected) socket.connect();
+
     socket.emit("join-room", roomId, username);
 
     socket.on("receive-message", (message) => {
       setMessages((prev) => [...prev, message]);
     });
+    socket.on("user-left", (message) => {
+      setMessages((prev) => [...prev, message]);
+    });
 
     return () => {
       socket.off("receive-message");
+      socket.off("user-left");
     };
   }, [roomId, username]);
 
@@ -29,7 +33,10 @@ const ChatRoom = () => {
     const message = {
       text: inputMsg,
       username,
-      time: new Date().toLocaleTimeString(),
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
     socket.emit("chat-message", roomId, message);
     setMessages((prev) => [...prev, message]);
@@ -37,6 +44,7 @@ const ChatRoom = () => {
   };
 
   const leaveRoom = () => {
+    socket.emit("leave-room", roomId, username);
     navigate("/rooms");
   };
 
@@ -46,7 +54,7 @@ const ChatRoom = () => {
         <h2 className="text-xl font-bold mb-4 text-center">Room: {roomId}</h2>
         <button
           onClick={leaveRoom}
-          className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 text-sm mb-3"
+          className="bg-red-700 text-white px-3 py-1 rounded hover:bg-red-800 text-sm shadow mr-20 mb-5"
         >
           Leave Room
         </button>

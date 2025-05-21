@@ -3,10 +3,12 @@ import {BrowserRouter as Router , Route,Routes} from "react-router-dom"
 import Login from "./pages/Login";
 import RoomOptions from "./pages/RoomOptions";
 import ChatRoom from "./pages/ChatRoom";
+import Logout from "./comonents/Logout";
 
 const App = () => {
   return (
     <Router>
+      <Logout/>
       <Routes>
         <Route path="/login" element={<Login/>} />
         <Route path="/rooms" element={<RoomOptions/>} />
