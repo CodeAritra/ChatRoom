@@ -33,6 +33,7 @@ const RoomOptions = () => {
           <button className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600" onClick={joinRoom}>
             Join Room
           </button>
+          <div className="my-1 h-px bg-gray-300" />
           <button className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600" onClick={generateRoomCode}>
             Create Room
           </button>
